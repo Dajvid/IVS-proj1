@@ -58,7 +58,7 @@ protected:
     Matrix mat2x2E = Matrix(2, 2);
 
     virtual void SetUp() {
-        EXPECT_ANY_THROW(Matrix mat = Matrix(-2, 4));
+        EXPECT_ANY_THROW(Matrix mat = Matrix(0, 4));
         std::vector<std::vector<double>> matA = {{2, 10}, {4, -16}};
         std::vector<std::vector<double>> matB = {{-11, 55}, {4, 151}};
         std::vector<std::vector<double>> matC = {{10, 15, 8}, {1, 22, 16}};
@@ -83,13 +83,13 @@ protected:
     Matrix mat3x2 = Matrix(3, 2);
 
     double res_vec1x1 = 10;
-    std::vector<std::vector<double>> res {{10}, {5, 2}, {3, 0, 12}};
-    std::vector<std::vector<double>> roots {{2}, {1, 3}, {3.5, 1, 2.5}};
+    std::vector<std::vector<double>> res {{10}, {5, 2}, {3, 0, 12}, {3, 5, 1, -4}};
+    std::vector<std::vector<double>> roots {{2}, {1, 3}, {3.5, 1, 2.5}, {1, -1, 0, 3}};
 
     virtual void SetUp() {
         std::vector<std::vector<double>> mat2x2_val = {{2, 1}, {-1, 1}};
         std::vector<std::vector<double>> mat3x3_val = {{2, 1, -2}, {1, -1, -1}, {1, 1, 3}};
-        std::vector<std::vector<double>> mat4x4_val = {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}, {13, 14, 15, 16}};
+        std::vector<std::vector<double>> mat4x4_val = {{2, 2, -3, 1}, {1, 2, 4, 2}, {-1, 1, -1, 1}, {1, -1, 2, -2}};
 
         mat1x1.set(0, 0, 5);
         mat2x2.set(mat2x2_val);
@@ -100,6 +100,8 @@ protected:
 
 TEST_F(mat_2x2setup, test_mutator)
 {
+    std::vector<std::vector<double>> val = {{18, 1620, 125}, {-108, -2196}};
+
     /* initial values */
     EXPECT_DOUBLE_EQ(mat.get(0, 0), 0);
     EXPECT_DOUBLE_EQ(mat.get(0, 1), 0);
@@ -129,6 +131,7 @@ TEST_F(mat_2x2setup, test_mutator)
     EXPECT_FALSE(mat.set(2, 0, 1));
     EXPECT_FALSE(mat.set(2, 1, 1));
 
+    EXPECT_FALSE(mat.set(val));
     /* check */
     EXPECT_DOUBLE_EQ(mat.get(0, 0), 2);
     EXPECT_DOUBLE_EQ(mat.get(0, 1), 10);
@@ -139,8 +142,8 @@ TEST_F(mat_2x2setup, test_mutator)
 
 TEST_F(mat_binary_op_fixture, test_binary_op)
 {
-    Matrix mat_fail;
-    EXPECT_ANY_THROW(mat_fail = Matrix(-4, -5));
+    Matrix mat;
+    EXPECT_ANY_THROW(Matrix(-4, -5));
     std::vector<std::vector<double>> mul_res = {{18, 1620}, {-108, -2196}};
 
     /* op == */
@@ -174,9 +177,15 @@ TEST_F(mat_equation_fixture, test_equation)
     EXPECT_DOUBLE_EQ(result[1], roots[2][1]);
     EXPECT_DOUBLE_EQ(result[2], roots[2][2]);
 
+    result = mat4x4.solveEquation(res[3]);
+    EXPECT_DOUBLE_EQ(result[0], roots[3][0]);
+    EXPECT_DOUBLE_EQ(result[1], roots[3][1]);
+    EXPECT_DOUBLE_EQ(result[2], roots[3][2]);
+    EXPECT_DOUBLE_EQ(result[3], roots[3][3]);
+
+    EXPECT_ANY_THROW(mat3x2.solveEquation(res[1]));
     EXPECT_ANY_THROW(mat2x2.solveEquation(res[0]));
-    EXPECT_ANY_THROW(mat3x2.solveEquation(res[0]));
-    EXPECT_ANY_THROW(zero_mat.solveEquation(res[0]));
+    EXPECT_ANY_THROW(zero_mat.solveEquation(res[2]));
 }
 
 
