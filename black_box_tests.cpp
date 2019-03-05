@@ -43,6 +43,8 @@ protected:
 TEST_F(EmptyTree, InsertNode_0)
 {
     std::pair<bool, Node_t *> inserted, inserted_duplicit;
+    std::vector<int> keys = {10, 12, 43, 18, 55, 60, 21, 23};
+    std::vector<std::pair<bool, Node_t *>> result;
 
     inserted_duplicit = tree.InsertNode(10);
     EXPECT_TRUE(inserted_duplicit.first);
@@ -59,6 +61,18 @@ TEST_F(EmptyTree, InsertNode_0)
     inserted = tree.InsertNode(10);
     EXPECT_FALSE(inserted.first);
     EXPECT_TRUE(inserted.second == inserted_duplicit.second);
+
+    /* delete inserted nodes */
+    tree.DeleteNode(10);
+    tree.DeleteNode(33);
+    tree.DeleteNode(-5);
+    tree.DeleteNode(10);
+
+    /* insert multiple nodes to empty tree */
+    tree.InsertNodes(keys, result);
+    for (int i = 0; i < result.size(); i++) {
+        EXPECT_TRUE(result[i].first);
+    }
 }
 
 TEST_F(EmptyTree, DeleteNode_0)
@@ -79,6 +93,34 @@ TEST_F(EmptyTree, FindNode_0)
     EXPECT_FALSE(tree.FindNode(5));
     EXPECT_FALSE(tree.FindNode(-68));
     EXPECT_FALSE(tree.FindNode(91));
+
+    EXPECT_FALSE(tree.GetRoot());
+
+    /* try to get all leaf nodes from empty tree */
+    std::vector<Node_t *> result;
+    Node_t node1, node2;
+    tree.GetLeafNodes(result);
+    EXPECT_TRUE(result.size() == 0);
+    result.push_back(&node1);
+    result.push_back(&node2);
+    tree.GetLeafNodes(result);
+    EXPECT_TRUE(result.size() == 0);
+
+    /* try to get all nodes from empty tree */
+    tree.GetAllNodes(result);
+    EXPECT_TRUE(result.size() == 0);
+    result.push_back(&node1);
+    result.push_back(&node2);
+    tree.GetAllNodes(result);
+    EXPECT_TRUE(result.size() == 0);
+
+    /* try to get all non-leaf nodes from empty tree */
+    tree.GetNonLeafNodes(result);
+    EXPECT_TRUE(result.size() == 0);
+    result.push_back(&node1);
+    result.push_back(&node2);
+    tree.GetNonLeafNodes(result);
+    EXPECT_TRUE(result.size() == 0);
 
     EXPECT_FALSE(tree.GetRoot());
 }
@@ -103,6 +145,8 @@ protected:
 TEST_F(NonEmptyTree, InsertNode_0)
 {
     std::pair<bool, Node_t *> inserted, inserted_duplicit;
+    std::vector<int> keys = {10, 12, 43, 18, 55, 60, 21, 23};
+    std::vector<std::pair<bool, Node_t *>> result;
 
     inserted_duplicit = tree.InsertNode(-445);
     EXPECT_FALSE(inserted_duplicit.first);
@@ -123,6 +167,13 @@ TEST_F(NonEmptyTree, InsertNode_0)
     inserted = tree.InsertNode(10);
     EXPECT_FALSE(inserted.first);
     EXPECT_TRUE(inserted.second == inserted_duplicit.second);
+
+    /* insert multiple nodes to non empty tree */
+    tree.InsertNodes(keys, result);
+    EXPECT_FALSE(result[0].first);
+    for (int i = 1; i < result.size(); i++) {
+        EXPECT_TRUE(result[i].first);
+    }
 }
 
 TEST_F(NonEmptyTree, DeleteNode_0)
@@ -146,6 +197,7 @@ TEST_F(NonEmptyTree, DeleteNode_0)
 TEST_F(NonEmptyTree, FindNode_0)
 {
     Node_t *found;
+    std::vector<Node_t *> result;
     int values[] = { 680, -992, 552, 214, 531, -445, 993, 316, 625, 419, -415, 298, -626, -954, 130, -372, -616,
                      968, -720, -312 };
 
@@ -164,6 +216,13 @@ TEST_F(NonEmptyTree, FindNode_0)
     found = tree.GetRoot();
     EXPECT_TRUE(found);
     EXPECT_EQ(found->key, 419);
+
+    tree.GetLeafNodes(result);
+    EXPECT_EQ(result.size(), 21);
+    tree.GetAllNodes(result);
+    EXPECT_EQ(result.size(), 41);
+    tree.GetNonLeafNodes(result);
+    EXPECT_EQ(result.size(), 20);
 }
 
 /* Axioms */
